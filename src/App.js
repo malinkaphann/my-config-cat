@@ -1,23 +1,40 @@
-import logo from './logo.svg';
+import { useEffect, useState } from 'react';
 import './App.css';
+import * as configcat from "configcat-js";
 
-function App() {
+const KEY = process.env.REACT_APP_CONFIG_CAT_SDK_KEY;
+
+const MY_FLAG = "amicambodian";
+
+const App = () => {
+
+  const [amICambodian, setAmICambodian] = useState(true);
+
+  useEffect(() => {
+
+    const configCatClient = configcat.createClient(KEY, 
+      {
+        pollIntervalSeconds: 4,
+        configChanged: function () {
+            updateLocalFlag();
+        }
+    });
+
+    const updateLocalFlag = async () => {
+      const data = await configCatClient.getValueAsync(MY_FLAG, true);
+      setAmICambodian(data);
+    }
+
+    updateLocalFlag()
+
+  },[]);
+
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div style={{display: "flex", justifyContent: "center", alignItems: "center", marginTop: "100px"}}>
+    <div>
+      I am Cambodian. {amICambodian ? '===> yes of course' : '===> no you\'re not'}
+    </div>
     </div>
   );
 }
